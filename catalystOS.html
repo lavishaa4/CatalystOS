@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CatalystOS — National Molecular Discovery Platform</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --navy:        #0A2240;
+  --navy-mid:    #0D3264;
+  --navy-light:  #1A4A8A;
+  --navy-pale:   #E8EEF7;
+  --saffron:     #E07B1A;
+  --saffron-light:#FDF3E7;
+  --saffron-mid: #F5A84A;
+  --green-gov:   #1A6B3C;
+  --green-light: #E6F4EC;
+  --red-gov:     #C0392B;
+  --red-light:   #FDECEA;
+  --amber-gov:   #B45309;
+  --amber-light: #FEF3C7;
+  --white:       #FFFFFF;
+  --grey-50:     #F7F8FA;
+  --grey-100:    #EEF0F4;
+  --grey-200:    #DDE1EA;
+  --grey-300:    #B8BFD0;
+  --grey-400:    #8A94A8;
+  --grey-500:    #5C6880;
+  --grey-700:    #2E3A52;
+  --grey-900:    #111827;
+  --border:      #D0D7E6;
+  --border-dark: #B0BAD0;
+  --font-ui:     'IBM Plex Sans', sans-serif;
+  --font-serif:  'IBM Plex Serif', serif;
+  --font-mono:   'IBM Plex Mono', monospace;
+  --shadow-sm:   0 1px 3px rgba(10,34,64,0.08);
+  --shadow-md:   0 3px 10px rgba(10,34,64,0.10);
+  --shadow-lg:   0 6px 24px rgba(10,34,64,0.12);
+  --r: 4px; --r-md: 6px; --r-lg: 8px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--grey-50); color: var(--grey-900); font-family: var(--font-ui); font-size: 14px; line-height: 1.5; overflow: hidden; }
+
+/* GOV BANNER */
+.gov-banner { background: var(--navy); padding: 6px 24px; display: flex; align-items: center; gap: 14px; border-bottom: 3px solid var(--saffron); flex-shrink: 0; z-index: 100; }
+.emblem { width: 36px; height: 36px; background: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.gov-title-block { flex: 1; }
+.gov-title { font-family: var(--font-serif); font-size: 15px; font-weight: 600; color: var(--white); letter-spacing: 0.01em; }
+.gov-subtitle { font-size: 10px; color: #A0B8D8; letter-spacing: 0.05em; text-transform: uppercase; }
+.gov-right { display: flex; align-items: center; gap: 12px; }
+.gov-badge { background: var(--saffron); color: var(--white); font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 2px; letter-spacing: 0.04em; text-transform: uppercase; font-family: var(--font-mono); }
+.gov-date { font-size: 11px; color: #A0B8D8; font-family: var(--font-mono); }
+
+/* APP SHELL */
+.app { display: flex; height: calc(100vh - 55px); }
+
+/* SIDEBAR */
+.sidebar { width: 232px; min-width: 232px; background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; box-shadow: var(--shadow-sm); z-index: 10; }
+.sidebar-header { background: var(--navy-mid); padding: 16px 16px 14px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.sys-name { font-size: 13px; font-weight: 700; color: var(--white); letter-spacing: 0.02em; }
+.sys-id { font-size: 10px; color: #7FA8D8; font-family: var(--font-mono); margin-top: 2px; }
+.pilot-row { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08); border-radius: var(--r); padding: 6px 8px; margin-top: 10px; }
+.pilot-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ADE80; animation: pulse 2s infinite; flex-shrink: 0; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+.pilot-text { font-size: 11px; color: #C0D8F0; }
+.pilot-text strong { color: var(--white); font-size: 11px; display: block; }
+.sidebar-nav { flex: 1; padding: 10px 8px; overflow-y: auto; }
+.nav-section { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey-300); padding: 10px 8px 4px; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: var(--r); cursor: pointer; color: var(--grey-500); font-size: 13px; font-weight: 400; transition: all 0.12s; margin-bottom: 1px; border-left: 2px solid transparent; }
+.nav-item:hover { background: var(--navy-pale); color: var(--navy-mid); }
+.nav-item.active { background: var(--navy-pale); color: var(--navy-mid); border-left-color: var(--navy-mid); font-weight: 600; }
+.nav-icon { width: 15px; text-align: center; font-size: 13px; flex-shrink: 0; }
+.nav-count { margin-left: auto; font-size: 10px; font-weight: 600; font-family: var(--font-mono); background: var(--amber-light); color: var(--amber-gov); padding: 1px 6px; border-radius: 10px; }
+.nav-count.red { background: var(--red-light); color: var(--red-gov); }
+.sidebar-footer { padding: 10px 12px; border-top: 1px solid var(--border); background: var(--grey-50); }
+.version-row { font-size: 10px; color: var(--grey-300); font-family: var(--font-mono); }
+
+/* MAIN */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.breadbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--grey-400); }
+.breadcrumb .sep { color: var(--grey-300); }
+.breadcrumb .current { color: var(--grey-700); font-weight: 500; }
+.bar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 2px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; border: 1px solid; }
+.pill-green   { background: var(--green-light); color: var(--green-gov); border-color: #A7D7BB; }
+.pill-amber   { background: var(--amber-light); color: var(--amber-gov); border-color: #FCD296; }
+.pill-navy    { background: var(--navy-pale); color: var(--navy-mid); border-color: #B0C4E0; }
+.pill-red     { background: var(--red-light); color: var(--red-gov); border-color: #F5ADA8; }
+.pill-saffron { background: var(--saffron-light); color: var(--saffron); border-color: #F5C88A; }
+.content { flex: 1; overflow-y: auto; padding: 20px 24px; background: var(--grey-50); }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--grey-100); }
+::-webkit-scrollbar-thumb { background: var(--grey-300); border-radius: 3px; }
+
+/* VIEWS */
+.view { display: none; animation: fadeIn 0.2s ease; }
+.view.active { display: block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+/* SECTION HEADER */
+.section-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+.section-title { font-family: var(--font-serif); font-size: 17px; font-weight: 600; color: var(--navy); }
+.section-desc { font-size: 12px; color: var(--grey-400); margin-top: 2px; }
+
+/* CARD */
+.card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); }
+.card-header { padding: 13px 18px 11px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.card-title { font-size: 12px; font-weight: 700; color: var(--grey-700); letter-spacing: 0.05em; text-transform: uppercase; }
+.card-body { padding: 16px 18px; }
+
+/* STAT GRID */
+.stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 16px; }
+.stat-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px 18px; box-shadow: var(--shadow-sm); border-top: 3px solid var(--navy-light); }
+.stat-card.amber-top { border-top-color: var(--saffron); }
+.stat-card.green-top { border-top-color: var(--green-gov); }
+.stat-card.red-top   { border-top-color: var(--red-gov); }
+.stat-label { font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--grey-400); margin-bottom: 6px; }
+.stat-value { font-size: 28px; font-weight: 700; color: var(--navy); font-family: var(--font-mono); line-height: 1; }
+.stat-sub { font-size: 11px; color: var(--grey-400); margin-top: 5px; }
+.stat-delta { font-size: 11px; margin-top: 4px; font-weight: 500; }
+.delta-up { color: var(--green-gov); }
+.delta-dn { color: var(--red-gov); }
+
+/* GRIDS */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+.mb-16 { margin-bottom: 16px; }
+
+/* TABLE */
+.table-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+.table-toolbar { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; background: var(--grey-50); }
+.table-title { font-size: 13px; font-weight: 600; color: var(--navy); }
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: var(--grey-50); border-bottom: 2px solid var(--border-dark); }
+thead th { padding: 9px 14px; text-align: left; font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--grey-500); white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; cursor: pointer; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--navy-pale); }
+tbody td { padding: 10px 14px; font-size: 12px; color: var(--grey-700); vertical-align: middle; }
+.td-mono { font-family: var(--font-mono); font-size: 12px; }
+.td-primary { font-weight: 600; color: var(--navy); font-family: var(--font-mono); }
+
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: var(--r); font-family: var(--font-ui); font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: all 0.12s; text-transform: uppercase; letter-spacing: 0.04em; }
+.btn-primary { background: var(--navy-mid); color: var(--white); border-color: var(--navy-mid); }
+.btn-primary:hover { background: var(--navy); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-outline { background: var(--white); color: var(--navy-mid); border-color: var(--border-dark); }
+.btn-outline:hover { background: var(--navy-pale); }
+.btn-saffron { background: var(--saffron); color: var(--white); border-color: var(--saffron); }
+.btn-saffron:hover { background: #C96B0E; }
+
+/* INPUTS */
+.search-input, .form-input, .form-select { background: var(--white); border: 1px solid var(--border-dark); border-radius: var(--r); padding: 7px 11px; color: var(--grey-900); font-family: var(--font-ui); font-size: 12px; outline: none; transition: border-color 0.12s, box-shadow 0.12s; }
+.search-input { width: 200px; }
+.search-input:focus,.form-input:focus,.form-select:focus { border-color: var(--navy-light); box-shadow: 0 0 0 3px rgba(26,74,138,0.12); }
+.search-input::placeholder,.form-input::placeholder { color: var(--grey-300); }
+
+/* FILTER TABS */
+.filter-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 16px; }
+.tab-btn { padding: 8px 16px; font-size: 12px; font-weight: 600; color: var(--grey-400); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.12s; font-family: var(--font-ui); background: transparent; border-top: none; border-left: none; border-right: none; text-transform: uppercase; letter-spacing: 0.04em; }
+.tab-btn:hover { color: var(--navy-mid); }
+.tab-btn.active { color: var(--navy-mid); border-bottom-color: var(--navy-mid); }
+
+/* BARS */
+.mini-bar-wrap { width: 80px; height: 5px; background: var(--grey-100); border-radius: 2px; display: inline-block; vertical-align: middle; }
+.mini-bar { height: 5px; border-radius: 2px; }
+.metric-row { display: flex; flex-direction: column; gap: 6px; }
+.metric { display: flex; align-items: center; gap: 8px; }
+.metric-label { font-size: 10px; font-weight: 600; color: var(--grey-400); width: 66px; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.05em; }
+.metric-bar-bg { flex: 1; height: 5px; background: var(--grey-100); border-radius: 3px; }
+.metric-bar { height: 5px; border-radius: 3px; transition: width 0.7s ease; }
+.bar-navy { background: var(--navy-light); }
+.bar-saff { background: var(--saffron); }
+.bar-green { background: var(--green-gov); }
+.metric-val { font-size: 11px; font-family: var(--font-mono); color: var(--grey-700); width: 32px; text-align: right; flex-shrink: 0; }
+.acc-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.acc-row:last-child { border-bottom: none; }
+.acc-name { width: 90px; flex-shrink: 0; font-family: var(--font-mono); font-size: 11px; color: var(--grey-500); }
+.acc-bar-wrap { flex: 1; height: 6px; background: var(--grey-100); border-radius: 3px; position: relative; }
+.acc-pred { height: 6px; border-radius: 3px; background: var(--grey-300); position: absolute; top:0;left:0; }
+.acc-actual { height: 6px; border-radius: 3px; background: var(--navy-light); position: absolute; top:0;left:0; }
+.acc-pct { font-family: var(--font-mono); font-size: 11px; color: var(--grey-500); width: 38px; text-align: right; flex-shrink: 0; }
+
+/* CANDIDATE CARDS */
+.cand-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.cand-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px; box-shadow: var(--shadow-sm); transition: all 0.12s; cursor: pointer; position: relative; }
+.cand-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); border-color: var(--navy-light); }
+.cand-card.novel { border-left: 3px solid var(--saffron); }
+.ai-tag { position: absolute; top: 12px; right: 12px; background: var(--saffron-light); color: var(--saffron); font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 2px; border: 1px solid #F5C88A; font-family: var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; }
+.rank-badge { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; background: var(--grey-100); color: var(--grey-500); margin-right: 6px; flex-shrink: 0; }
+.rank-1 { background: var(--amber-light); color: var(--amber-gov); }
+.rank-2 { background: var(--grey-100); color: var(--grey-500); }
+.rank-3 { background: var(--saffron-light); color: var(--saffron); }
+.cand-name { font-size: 13px; font-weight: 700; color: var(--navy); font-family: var(--font-mono); }
+.cand-reaction { font-size: 11px; color: var(--grey-400); margin: 4px 0 12px; }
+
+/* GAP ROWS */
+.gap-row { display: flex; align-items: flex-start; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
+.gap-row:last-child { border-bottom: none; }
+.gap-row:hover { background: var(--grey-50); }
+.gap-sev { width: 4px; border-radius: 2px; flex-shrink: 0; align-self: stretch; min-height: 50px; }
+.sev-high { background: var(--red-gov); }
+.sev-med  { background: var(--saffron); }
+.sev-opp  { background: var(--green-gov); }
+.gap-content { flex: 1; }
+.gap-title { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 3px; }
+.gap-desc { font-size: 12px; color: var(--grey-500); line-height: 1.55; }
+.gap-meta { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.gap-right { flex-shrink: 0; text-align: right; }
+.gap-delta { font-family: var(--font-mono); font-size: 12px; font-weight: 600; }
+
+/* CHAT */
+.chat-layout { display: flex; gap: 16px; height: calc(100vh - 162px); }
+.chat-panel { flex: 1.2; display: flex; flex-direction: column; background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+.chat-header { padding: 13px 18px; border-bottom: 1px solid var(--border); background: var(--grey-50); display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.chat-header-icon { width: 32px; height: 32px; background: var(--navy-pale); border: 1px solid var(--border-dark); border-radius: var(--r); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+.chat-title { font-size: 13px; font-weight: 700; color: var(--navy); }
+.chat-subtitle { font-size: 11px; color: var(--grey-400); }
+.chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.msg { display: flex; gap: 10px; max-width: 100%; animation: msgIn 0.25s ease; }
+@keyframes msgIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+.msg-avatar { width: 28px; height: 28px; border-radius: var(--r); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+.avatar-user { background: var(--navy-pale); color: var(--navy-mid); border: 1px solid var(--border-dark); }
+.avatar-ai   { background: var(--saffron-light); color: var(--saffron); border: 1px solid #F5C88A; }
+.msg-bubble { background: var(--grey-50); border: 1px solid var(--border); border-radius: 2px var(--r-md) var(--r-md) var(--r-md); padding: 10px 14px; font-size: 13px; color: var(--grey-700); line-height: 1.6; max-width: calc(100% - 40px); }
+.msg.user { flex-direction: row-reverse; }
+.msg.user .msg-bubble { background: var(--navy-pale); border-color: #B0C4E0; border-radius: var(--r-md) 2px var(--r-md) var(--r-md); color: var(--navy); }
+.msg-bubble strong { color: var(--navy); }
+.msg-bubble code { font-family: var(--font-mono); font-size: 11px; background: var(--grey-100); padding: 1px 5px; border-radius: 3px; }
+.typing-indicator { display: flex; gap: 4px; align-items: center; padding: 10px 14px; background: var(--grey-50); border: 1px solid var(--border); border-radius: 2px var(--r-md) var(--r-md) var(--r-md); width: fit-content; }
+.typing-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--navy-light); animation: blink 1.2s infinite; }
+.typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+.suggestions { display: flex; flex-wrap: wrap; gap: 5px; padding: 8px 16px; flex-shrink: 0; border-top: 1px solid var(--border); background: var(--grey-50); }
+.sug-pill { background: var(--white); border: 1px solid var(--border-dark); border-radius: var(--r); padding: 4px 10px; font-size: 11px; color: var(--grey-500); cursor: pointer; transition: all 0.12s; }
+.sug-pill:hover { background: var(--navy-pale); border-color: var(--navy-light); color: var(--navy-mid); }
+.chat-input-area { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-shrink: 0; background: var(--white); }
+.chat-input { flex: 1; background: var(--white); border: 1px solid var(--border-dark); border-radius: var(--r); padding: 8px 12px; color: var(--grey-900); font-family: var(--font-ui); font-size: 13px; outline: none; resize: none; transition: border-color 0.12s, box-shadow 0.12s; }
+.chat-input:focus { border-color: var(--navy-light); box-shadow: 0 0 0 3px rgba(26,74,138,0.1); }
+.chat-input::placeholder { color: var(--grey-300); }
+.context-panel { width: 258px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+.context-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.context-item:last-child { border-bottom: none; }
+.context-icon { font-size: 14px; flex-shrink: 0; }
+.context-name { font-weight: 500; color: var(--grey-700); }
+.context-meta { font-size: 10px; color: var(--grey-400); font-family: var(--font-mono); }
+
+/* FORMS */
+.form-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+.form-label { font-size: 11px; font-weight: 600; color: var(--grey-500); width: 110px; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.04em; }
+.form-input, .form-select { flex: 1; }
+
+/* ACTIVITY */
+.activity-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.activity-item:last-child { border-bottom: none; }
+.act-icon { width: 26px; height: 26px; border-radius: var(--r); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; border: 1px solid var(--border); }
+.act-text { color: var(--grey-500); line-height: 1.4; }
+.act-text strong { color: var(--navy); }
+.act-time { margin-left: auto; font-size: 10px; color: var(--grey-300); white-space: nowrap; font-family: var(--font-mono); }
+
+/* WORKFLOW */
+.workflow-step { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+.workflow-step:last-child { border-bottom: none; }
+.step-num { width: 24px; height: 24px; background: var(--navy-mid); color: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.step-title { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
+.step-desc { font-size: 12px; color: var(--grey-400); }
+.dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; }
+.dot-g { background: var(--green-gov); }
+.dot-a { background: var(--saffron); }
+.dot-gr { background: var(--grey-300); }
+
+/* KNOWLEDGE GRAPH */
+.kg-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.kg-item:last-child { border-bottom: none; }
+.kg-badge { display: inline-block; padding: 2px 8px; font-size: 10px; font-weight: 700; font-family: var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; border-radius: 2px; }
+.kg-high { background: var(--green-light); color: var(--green-gov); }
+.kg-med  { background: var(--amber-light); color: var(--amber-gov); }
+
+/* PREDICTION */
+.pred-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.pred-row:last-child { border-bottom: none; }
+.pred-lbl { font-size: 12px; color: var(--grey-500); width: 160px; flex-shrink: 0; }
+.pred-bar-bg { flex: 1; height: 8px; background: var(--grey-100); border-radius: 4px; }
+.pred-bar { height: 8px; border-radius: 4px; background: var(--navy-light); transition: width 0.8s ease; }
+.pred-val { font-family: var(--font-mono); font-size: 12px; color: var(--navy); font-weight: 600; width: 52px; text-align: right; flex-shrink: 0; }
+
+/* RECOMMENDER */
+.rec-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-bottom: 1px solid var(--border); }
+.rec-item:last-child { border-bottom: none; }
+.rec-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; font-family: var(--font-mono); background: var(--grey-100); color: var(--grey-500); }
+.rec-num.h { background: var(--red-light); color: var(--red-gov); }
+.rec-num.m { background: var(--amber-light); color: var(--amber-gov); }
+.tag-sel { display: inline-flex; align-items: center; padding: 5px 12px; font-size: 12px; border: 1px solid var(--border-dark); background: var(--white); color: var(--grey-500); margin: 3px; cursor: pointer; transition: all 0.1s; border-radius: var(--r); }
+.tag-sel:hover { border-color: var(--navy-mid); color: var(--navy-mid); }
+.tag-sel.on { background: var(--navy-mid); border-color: var(--navy-mid); color: var(--white); }
+
+/* MISC */
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--navy); border-left: 4px solid var(--saffron); border-radius: var(--r-md); padding: 12px 16px; font-size: 13px; color: var(--white); display: none; z-index: 999; box-shadow: var(--shadow-lg); }
+.toast.show { display: block; animation: slideUp 0.25s ease; }
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.divider { height: 1px; background: var(--border); margin: 14px 0; }
+.scroll-x { overflow-x: auto; }
+input[type=range] { width: 100%; accent-color: var(--navy-mid); }
+</style>
+</head>
+<body>
+
+<!-- GOV BANNER -->
+<div class="gov-banner">
+  <div class="emblem">🇮🇳</div>
+  <div class="gov-title-block">
+    <div class="gov-title">CatalystOS — National Molecular Discovery Platform</div>
+    <div class="gov-subtitle">Ministry of Science &amp; Technology · GPS Renewables NG SAF Program · AI for Bharat 2026</div>
+  </div>
+  <div class="gov-right">
+    <span class="gov-badge">GPS Renewables Pilot</span>
+    <span class="gov-date" id="live-date"></span>
+  </div>
+</div>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sys-name">CatalystOS</div>
+      <div class="sys-id">SYS/CATOS/2026/04</div>
+      <div class="pilot-row">
+        <div class="pilot-dot"></div>
+        <div class="pilot-text"><strong>GPS Renewables</strong>NG SAF · Ethanol-to-Jet</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Dashboard</div>
+      <div class="nav-item active" onclick="showView('dashboard')"><span class="nav-icon">▦</span> Overview</div>
+      <div class="nav-item" onclick="showView('copilot')"><span class="nav-icon">◈</span> AI Research Copilot</div>
+      <div class="nav-section">Discovery</div>
+      <div class="nav-item" onclick="showView('discovery')"><span class="nav-icon">⬡</span> Candidate Discovery</div>
+      <div class="nav-item" onclick="showView('experiments')"><span class="nav-icon">≡</span> Experiment Log<span class="nav-count">24</span></div>
+      <div class="nav-section">Analysis</div>
+      <div class="nav-item" onclick="showView('prediction')"><span class="nav-icon">◎</span> Prediction Engine</div>
+      <div class="nav-item" onclick="showView('recommender')"><span class="nav-icon">★</span> Recommender</div>
+      <div class="nav-section">Intelligence</div>
+      <div class="nav-item" onclick="showView('knowledge')"><span class="nav-icon">◈</span> Knowledge Graph</div>
+      <div class="nav-item" onclick="showView('gaps')"><span class="nav-icon">△</span> Gap Intelligence<span class="nav-count red">3</span></div>
+      <div class="nav-item" onclick="showView('feedback')"><span class="nav-icon">↺</span> Feedback Loop</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="version-row">BUILD 2026.04 · SECURE · GOI CLASSIFIED</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="breadbar">
+      <div class="breadcrumb">
+        <span>CatalystOS</span><span class="sep">›</span><span class="current" id="bc-current">Overview</span>
+      </div>
+      <div class="bar-right">
+        <span class="status-pill pill-green">● System Active</span>
+        <span class="status-pill pill-saffron">Ethanol → Jet Fuel</span>
+        <span class="status-pill pill-navy">24 Experiments</span>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- ===== DASHBOARD ===== -->
+      <div class="view active" id="view-dashboard">
+        <div class="section-header">
+          <div><div class="section-title">Research Overview</div><div class="section-desc">GPS Renewables · NG SAF Program · Ethanol-to-Jet Catalyst Discovery</div></div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">Candidates Tested</div><div class="stat-value">24</div><div class="stat-delta delta-up">↑ 6 new this week</div></div>
+          <div class="stat-card amber-top"><div class="stat-label">AI-Generated Designs</div><div class="stat-value" style="color:var(--saffron)">5</div><div class="stat-delta" style="color:var(--grey-400)">Novel structural variants</div></div>
+          <div class="stat-card green-top"><div class="stat-label">Prediction Accuracy</div><div class="stat-value" style="color:var(--green-gov)">78%</div><div class="stat-delta delta-up">↑ +4% after retraining</div></div>
+          <div class="stat-card red-top"><div class="stat-label">Active Gaps</div><div class="stat-value" style="color:var(--red-gov)">3</div><div class="stat-delta delta-dn">Require investigation</div></div>
+        </div>
+        <div class="grid-2 mb-16">
+          <div class="card">
+            <div class="card-header"><div class="card-title">E2J Reaction Pipeline</div><span class="status-pill pill-green" style="margin-left:auto;font-size:9px">In Progress</span></div>
+            <div class="card-body">
+              <div class="workflow-step"><div class="step-num">1</div><div><div class="step-title">Ethanol dehydration → Ethylene</div><div class="step-desc"><span class="dot dot-g"></span>Optimised · ZSM-5 zeolite · 380°C · 99.1% purity</div></div></div>
+              <div class="workflow-step"><div class="step-num">2</div><div><div class="step-title">Ethylene oligomerization → C6–C16</div><div class="step-desc"><span class="dot dot-g"></span>Active · Ni-SAPO-34 · Target &gt;65% selectivity</div></div></div>
+              <div class="workflow-step"><div class="step-num">3</div><div><div class="step-title">Hydroprocessing → Jet fuel range</div><div class="step-desc"><span class="dot dot-a"></span>Optimising · Cu-Zn/SiO₂ top candidate at 330°C</div></div></div>
+              <div class="workflow-step"><div class="step-num">4</div><div><div class="step-title">Isomerization → Freeze-point spec</div><div class="step-desc"><span class="dot dot-gr"></span>Pending · Pt/SAPO-11 candidate · Target ≤−47°C</div></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">System Activity Log</div></div>
+            <div class="card-body" style="padding:12px 18px">
+              <div class="activity-item"><div class="act-icon" style="background:var(--saffron-light)">⚗</div><div class="act-text">AI proposed <strong>Cu-Zn-Pd variant #3</strong> as novel candidate</div><span class="act-time">2m</span></div>
+              <div class="activity-item"><div class="act-icon" style="background:var(--red-light)">△</div><div class="act-text"><strong>Gap detected:</strong> Fe catalysts fail above 320°C — coking confirmed</div><span class="act-time">1h</span></div>
+              <div class="activity-item"><div class="act-icon" style="background:var(--navy-pale)">≡</div><div class="act-text">Experiment <strong>EXP-024</strong> logged — Pd/Al₂O₃ passed selectivity</div><span class="act-time">3h</span></div>
+              <div class="activity-item"><div class="act-icon" style="background:var(--green-light)">↺</div><div class="act-text">Model retrained on 4 new results — accuracy improved +4%</div><span class="act-time">1d</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Top Performing Candidates</div></div>
+            <div class="card-body">
+              <div class="acc-row"><div class="acc-name">Cu-Zn/SiO₂</div><div class="acc-bar-wrap"><div class="acc-actual" style="width:88%"></div></div><div class="acc-pct" style="color:var(--navy-mid);font-weight:600">88%</div></div>
+              <div class="acc-row"><div class="acc-name">Pd-Ag/Al₂O₃</div><div class="acc-bar-wrap"><div class="acc-actual" style="width:82%"></div></div><div class="acc-pct" style="color:var(--navy-mid);font-weight:600">82%</div></div>
+              <div class="acc-row"><div class="acc-name">Fe-Co/ZSM-5 ✦</div><div class="acc-bar-wrap"><div class="acc-actual" style="width:79%;background:var(--saffron)"></div></div><div class="acc-pct" style="color:var(--saffron);font-weight:600">79%</div></div>
+              <div class="acc-row"><div class="acc-name">Ni-Mo/TiO₂</div><div class="acc-bar-wrap"><div class="acc-actual" style="width:71%"></div></div><div class="acc-pct">71%</div></div>
+              <div class="acc-row"><div class="acc-name">Cu-Ce/ZrO₂ ✦</div><div class="acc-bar-wrap"><div class="acc-actual" style="width:68%;background:var(--saffron)"></div></div><div class="acc-pct" style="color:var(--saffron)">68%</div></div>
+              <div style="margin-top:8px;font-size:10px;color:var(--grey-300)">✦ AI-generated novel design</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Prediction vs Actual — Last 6 Experiments</div></div>
+            <div class="card-body">
+              <div class="acc-row"><div class="acc-name">EXP-019</div><div class="acc-bar-wrap" style="height:10px;border-radius:3px"><div class="acc-pred" style="width:75%;height:10px;border-radius:3px"></div><div class="acc-actual" style="width:68%;height:10px;border-radius:3px"></div></div><div class="acc-pct" style="color:var(--red-gov)">−7%</div></div>
+              <div class="acc-row"><div class="acc-name">EXP-020</div><div class="acc-bar-wrap" style="height:10px;border-radius:3px"><div class="acc-pred" style="width:82%;height:10px;border-radius:3px"></div><div class="acc-actual" style="width:85%;height:10px;border-radius:3px"></div></div><div class="acc-pct" style="color:var(--green-gov)">+3%</div></div>
+              <div class="acc-row"><div class="acc-name">EXP-021</div><div class="acc-bar-wrap" style="height:10px;border-radius:3px"><div class="acc-pred" style="width:70%;height:10px;border-radius:3px"></div><div class="acc-actual" style="width:72%;height:10px;border-radius:3px"></div></div><div class="acc-pct" style="color:var(--green-gov)">+2%</div></div>
+              <div class="acc-row"><div class="acc-name">EXP-022</div><div class="acc-bar-wrap" style="height:10px;border-radius:3px"><div class="acc-pred" style="width:88%;height:10px;border-radius:3px"></div><div class="acc-actual" style="width:74%;height:10px;border-radius:3px"></div></div><div class="acc-pct" style="color:var(--red-gov)">−14%</div></div>
+              <div class="acc-row"><div class="acc-name">EXP-023</div><div class="acc-bar-wrap" style="height:10px;border-radius:3px"><div class="acc-pred" style="width:65%;height:10px;border-radius:3px"></div><div class="acc-actual" style="width:67%;height:10px;border-radius:3px"></div></div><div class="acc-pct" style="color:var(--green-gov)">+2%</div></div>
+              <div class="acc-row"><div class="acc-name">EXP-024</div><div class="acc-bar-wrap" style="height:10px;border-radius:3px"><div class="acc-pred" style="width:80%;height:10px;border-radius:3px"></div><div class="acc-actual" style="width:82%;height:10px;border-radius:3px"></div></div><div class="acc-pct" style="color:var(--green-gov)">+2%</div></div>
+              <div style="display:flex;gap:14px;margin-top:10px;font-size:10px;color:var(--grey-300)">
+                <span><span style="display:inline-block;width:12px;height:4px;background:var(--grey-300);border-radius:2px;vertical-align:middle;margin-right:4px"></span>Predicted</span>
+                <span><span style="display:inline-block;width:12px;height:4px;background:var(--navy-light);border-radius:2px;vertical-align:middle;margin-right:4px"></span>Actual</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== AI COPILOT ===== -->
+      <div class="view" id="view-copilot">
+        <div class="chat-layout">
+          <div class="chat-panel">
+            <div class="chat-header">
+              <div class="chat-header-icon">◈</div>
+              <div><div class="chat-title">AI Research Copilot</div><div class="chat-subtitle">Catalyst discovery assistant — GPS Renewables NG SAF Program</div></div>
+              <div style="margin-left:auto"><span class="status-pill pill-green">● Online</span></div>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+              <div class="msg ai">
+                <div class="msg-avatar avatar-ai">AI</div>
+                <div class="msg-bubble">Namaste. I am your AI Research Copilot for the <strong>GPS Renewables NG SAF Program</strong>.<br/><br/>I have access to your complete experiment log (24 entries), the Open Catalyst Project, Materials Project, and BRENDA databases. I can assist with catalyst discovery, failure analysis, experiment recommendations, and reaction pathway explanations.<br/><br/>What target reaction are you investigating today?</div>
+              </div>
+            </div>
+            <div class="suggestions" id="suggestions">
+              <span class="sug-pill" onclick="sendSuggestion(this)">How do I start ethanol-to-jet screening?</span>
+              <span class="sug-pill" onclick="sendSuggestion(this)">Which Cu-Zn catalysts failed above 300°C?</span>
+              <span class="sug-pill" onclick="sendSuggestion(this)">Suggest novel candidates for CO₂ to methanol</span>
+              <span class="sug-pill" onclick="sendSuggestion(this)">What is the best performing catalyst this month?</span>
+            </div>
+            <div class="chat-input-area">
+              <textarea class="chat-input" id="chat-input" rows="1" placeholder="Enter research query…" onkeydown="handleKey(event)"></textarea>
+              <button class="btn btn-primary" onclick="sendMessage()" id="send-btn">Submit</button>
+            </div>
+          </div>
+          <div class="context-panel">
+            <div class="card">
+              <div class="card-header"><div class="card-title">Knowledge Sources</div></div>
+              <div class="card-body" style="padding:12px 16px">
+                <div class="context-item"><div class="context-icon">📊</div><div><div class="context-name">Open Catalyst Project</div><div class="context-meta">460M DFT calculations</div></div><span class="status-pill pill-green" style="margin-left:auto;font-size:9px">Live</span></div>
+                <div class="context-item"><div class="context-icon">🧬</div><div><div class="context-name">BRENDA Enzyme DB</div><div class="context-meta">Synthetic biology</div></div><span class="status-pill pill-green" style="margin-left:auto;font-size:9px">Live</span></div>
+                <div class="context-item"><div class="context-icon">⊞</div><div><div class="context-name">GPS Lab Experiments</div><div class="context-meta">24 internal records</div></div><span class="status-pill pill-green" style="margin-left:auto;font-size:9px">Synced</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">Session Context</div></div>
+              <div class="card-body">
+                <table style="width:100%">
+                  <tr><td style="font-size:11px;color:var(--grey-400);padding:4px 0">Reaction</td><td style="font-family:var(--font-mono);font-size:11px;color:var(--navy);text-align:right;font-weight:600">EtOH → Jet</td></tr>
+                  <tr><td style="font-size:11px;color:var(--grey-400);padding:4px 0">Target Temp</td><td style="font-family:var(--font-mono);font-size:11px;color:var(--grey-700);text-align:right">320–380°C</td></tr>
+                  <tr><td style="font-size:11px;color:var(--grey-400);padding:4px 0">Target Sel.</td><td style="font-family:var(--font-mono);font-size:11px;color:var(--grey-700);text-align:right">&gt;65%</td></tr>
+                  <tr><td style="font-size:11px;color:var(--grey-400);padding:4px 0">Session ID</td><td style="font-family:var(--font-mono);font-size:11px;color:var(--grey-700);text-align:right">GPS-2026-04</td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title" style="color:var(--red-gov)">Failure Memory</div></div>
+              <div class="card-body" style="padding:10px 16px">
+                <div style="font-size:11px;color:var(--grey-500);line-height:1.7">
+                  <div style="padding:5px 0;border-bottom:1px solid var(--border);display:flex;gap:6px"><span style="color:var(--red-gov);font-weight:700;flex-shrink:0">✗</span>Fe/Al₂O₃ — coking above 340°C</div>
+                  <div style="padding:5px 0;border-bottom:1px solid var(--border);display:flex;gap:6px"><span style="color:var(--red-gov);font-weight:700;flex-shrink:0">✗</span>Ni-Mo — poor selectivity at 1 bar</div>
+                  <div style="padding:5px 0;display:flex;gap:6px"><span style="color:var(--red-gov);font-weight:700;flex-shrink:0">✗</span>Cu/ZnO — deactivates within 48h</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CANDIDATE DISCOVERY ===== -->
+      <div class="view" id="view-discovery">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+          <input type="text" class="search-input" placeholder="Search by name or reaction…" oninput="filterSearch(this.value)"/>
+          <div style="margin-left:auto"><span class="status-pill pill-navy" style="font-size:10px">Ranked by predicted activity</span></div>
+        </div>
+        <div class="filter-tabs">
+          <button class="tab-btn active" onclick="filterTab('all',this)">All Candidates (13)</button>
+          <button class="tab-btn" onclick="filterTab('known',this)">Known (8)</button>
+          <button class="tab-btn" onclick="filterTab('novel',this)">AI Generated (5)</button>
+        </div>
+        <div class="cand-grid" id="candidates-grid"></div>
+      </div>
+
+      <!-- ===== EXPERIMENT LOG ===== -->
+      <div class="view" id="view-experiments">
+        <div class="table-card">
+          <div class="table-toolbar">
+            <div class="table-title">Experiment Log</div>
+            <span class="status-pill pill-navy" style="font-size:10px">24 records</span>
+            <div style="margin-left:auto;display:flex;gap:8px;">
+              <input type="text" class="search-input" placeholder="Search…" style="width:160px" oninput="filterExp(this.value)"/>
+              <button class="btn btn-saffron" onclick="showView('feedback')" style="font-size:11px;padding:6px 12px">+ Log Result</button>
+            </div>
+          </div>
+          <div class="scroll-x">
+            <table>
+              <thead><tr><th>Exp. ID</th><th>Catalyst</th><th>Reaction</th><th>Temp (°C)</th><th>Pred. Yield</th><th>Actual Yield</th><th>Delta</th><th>Selectivity</th><th>Status</th><th>Remarks</th></tr></thead>
+              <tbody id="exp-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PREDICTION ENGINE ===== -->
+      <div class="view" id="view-prediction">
+        <div class="section-header">
+          <div><div class="section-title">Prediction &amp; Simulation Engine</div><div class="section-desc">Predicts activity, selectivity, stability, pathway yield, and reaction energy profiles for any candidate.</div></div>
+        </div>
+        <div class="grid-2 mb-16">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Candidate to Evaluate</div></div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-label">Catalyst</div>
+                <select class="form-select" id="pred-catalyst" onchange="updatePredMetrics()">
+                  <option>Cu-Zn/SiO₂</option>
+                  <option>Pd-Ag/Al₂O₃</option>
+                  <option>Fe-Co/ZSM-5 (Novel)</option>
+                  <option>Ru-Fe/Al₂O₃ SAC (Novel)</option>
+                  <option>Ni-SAPO-34</option>
+                  <option>Pd-Pt/HZSM-5 (Novel)</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <div class="form-label">Temperature</div>
+                <div style="flex:1">
+                  <input type="range" min="150" max="450" value="280" id="pred-temp" oninput="document.getElementById('ptv').textContent=this.value+'°C';updatePredMetrics()"/>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--grey-400);font-family:var(--font-mono);margin-top:2px"><span>150°C</span><span id="ptv" style="font-weight:600;color:var(--navy-mid)">280°C</span><span>450°C</span></div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-label">Pressure</div>
+                <select class="form-select"><option>1 bar</option><option>5 bar</option><option>10 bar</option><option>15 bar</option></select>
+              </div>
+              <button class="btn btn-primary" id="pred-btn" onclick="runPrediction()" style="width:100%;justify-content:center;margin-top:6px">Run Simulation</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Prediction Results</div><span class="status-pill pill-navy" style="margin-left:auto;font-size:9px">GradientBoost-E2J v2.1</span></div>
+            <div class="card-body">
+              <div class="pred-row"><div class="pred-lbl">Activity score</div><div class="pred-bar-bg"><div class="pred-bar" id="pb-act" style="width:88%"></div></div><div class="pred-val" id="pv-act">0.88</div></div>
+              <div class="pred-row"><div class="pred-lbl">Selectivity (C8–C16)</div><div class="pred-bar-bg"><div class="pred-bar" id="pb-sel" style="width:82%;background:var(--saffron)"></div></div><div class="pred-val" id="pv-sel">82%</div></div>
+              <div class="pred-row"><div class="pred-lbl">Thermal stability</div><div class="pred-bar-bg"><div class="pred-bar" id="pb-stab" style="width:79%;background:var(--green-gov)"></div></div><div class="pred-val" id="pv-stab">79%</div></div>
+              <div class="pred-row"><div class="pred-lbl">Pathway yield</div><div class="pred-bar-bg"><div class="pred-bar" id="pb-yield" style="width:81%"></div></div><div class="pred-val" id="pv-yield">81%</div></div>
+              <div class="pred-row"><div class="pred-lbl">Energy profile (ΔG)</div><div class="pred-bar-bg"><div class="pred-bar" id="pb-energy" style="width:70%;background:var(--navy)"></div></div><div class="pred-val" id="pv-energy">−1.2 eV</div></div>
+              <div style="margin-top:10px;font-size:10px;color:var(--grey-300);font-family:var(--font-mono)">Model: GradientBoost-E2J v2.1 · 4,200 synthetic datapoints</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Reaction Energy Profile</div><span class="status-pill pill-navy" style="margin-left:auto;font-size:9px">DFT-derived pathway</span></div>
+          <div class="card-body"><div style="height:190px"><canvas id="energy-canvas"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- ===== RECOMMENDER ===== -->
+      <div class="view" id="view-recommender">
+        <div class="section-header">
+          <div><div class="section-title">Experiment Recommender</div><div class="section-desc">Suggests next best experiments, parameter changes, and mutation strategies based on selected objectives.</div></div>
+        </div>
+        <div class="card mb-16">
+          <div class="card-header"><div class="card-title">Optimization Objective</div></div>
+          <div class="card-body">
+            <div style="margin-bottom:14px;margin-left:-3px">
+              <span class="tag-sel on" onclick="this.classList.toggle('on')">Maximize yield</span>
+              <span class="tag-sel on" onclick="this.classList.toggle('on')">Improve selectivity</span>
+              <span class="tag-sel" onclick="this.classList.toggle('on')">Minimize energy</span>
+              <span class="tag-sel" onclick="this.classList.toggle('on')">Reduce sintering</span>
+              <span class="tag-sel" onclick="this.classList.toggle('on')">Lower noble metal loading</span>
+            </div>
+            <button class="btn btn-primary" id="rec-btn" onclick="genRecs()">Generate Recommendations</button>
+          </div>
+        </div>
+        <div class="table-card">
+          <div class="table-toolbar"><div class="table-title">Recommended Experiments</div><span class="status-pill pill-navy" style="font-size:10px">4 recommendations</span></div>
+          <div class="rec-item"><div class="rec-num h">1</div><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><strong style="font-size:13px;color:var(--navy)">Screen Pt/SAPO-11 for isomerization step</strong><span class="status-pill pill-red" style="font-size:9px">High</span></div><div style="font-size:12px;color:var(--grey-500);margin-bottom:3px">Predicted freeze-point improvement: −8°C. Candidate has known low-temperature selectivity for C12–C16 fraction.</div><span style="font-size:10px;color:var(--grey-300);font-family:var(--font-mono)">PARAMETER CHANGE</span></div></div>
+          <div class="rec-item"><div class="rec-num h">2</div><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><strong style="font-size:13px;color:var(--navy)">Reduce Ru loading from 2.1% to 1.4% wt</strong><span class="status-pill pill-red" style="font-size:9px">High</span></div><div style="font-size:12px;color:var(--grey-500);margin-bottom:3px">Cost reduction with &lt;3% predicted yield loss. Based on sensitivity analysis across 340 data points.</div><span style="font-size:10px;color:var(--grey-300);font-family:var(--font-mono)">MUTATION STRATEGY</span></div></div>
+          <div class="rec-item"><div class="rec-num m">3</div><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><strong style="font-size:13px;color:var(--navy)">Increase oligomerization temperature to 295°C</strong><span class="status-pill pill-amber" style="font-size:9px">Medium</span></div><div style="font-size:12px;color:var(--grey-500);margin-bottom:3px">Predicted +4% C10–C14 fraction. Validate against sintering threshold for Ni-SAPO-34.</div><span style="font-size:10px;color:var(--grey-300);font-family:var(--font-mono)">PARAMETER CHANGE</span></div></div>
+          <div class="rec-item"><div class="rec-num">4</div><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><strong style="font-size:13px;color:var(--navy)">Co-dope with La₂O₃ for thermal stability</strong><span class="status-pill pill-navy" style="font-size:9px">Low</span></div><div style="font-size:12px;color:var(--grey-500);margin-bottom:3px">Stabilises metal dispersion above 350°C. Synthesis data suggests +18% lifetime extension.</div><span style="font-size:10px;color:var(--grey-300);font-family:var(--font-mono)">MUTATION STRATEGY</span></div></div>
+        </div>
+      </div>
+
+      <!-- ===== KNOWLEDGE GRAPH ===== -->
+      <div class="view" id="view-knowledge">
+        <div class="section-header">
+          <div><div class="section-title">Scientific Knowledge Graph</div><div class="section-desc">Unifies papers, lab notes, experimental data, and researcher insights into searchable scientific memory.</div></div>
+        </div>
+        <div class="card mb-16">
+          <div class="card-header"><div class="card-title">Search Scientific Memory</div></div>
+          <div class="card-body" style="display:flex;gap:8px">
+            <input type="text" class="form-input" style="flex:1" id="kg-q" placeholder="Search papers, lab notes, experimental data…" oninput="filterKG(this.value)"/>
+            <button class="btn btn-primary" onclick="filterKG(document.getElementById('kg-q').value)">Search</button>
+          </div>
+        </div>
+        <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stat-card"><div class="stat-label">Indexed Papers</div><div class="stat-value">5</div><div class="stat-sub">All highly relevant</div></div>
+          <div class="stat-card amber-top"><div class="stat-label">Lab Notes</div><div class="stat-value" style="color:var(--saffron)">3</div><div class="stat-sub">From internal experiments</div></div>
+          <div class="stat-card green-top"><div class="stat-label">External Databases</div><div class="stat-value" style="color:var(--green-gov)">3</div><div class="stat-sub">OCP · Materials Project · BRENDA</div></div>
+        </div>
+        <div style="height:14px"></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Literature Papers</div></div>
+            <div class="card-body" style="padding:8px 18px" id="kg-papers"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Lab Notes</div></div>
+            <div class="card-body" style="padding:8px 18px">
+              <div class="kg-item"><div style="display:flex;gap:10px;margin-bottom:4px"><span style="font-size:11px;color:var(--navy-mid);font-family:var(--font-mono);font-weight:600">LN-0041</span><span style="font-size:10px;color:var(--grey-400);font-family:var(--font-mono)">2026-04-12</span></div><div style="font-size:12px;color:var(--grey-500)">Ni-SAPO-34 run at 310°C — coke deposition observed after 18h. Recommend reducing residence time.</div></div>
+              <div class="kg-item"><div style="display:flex;gap:10px;margin-bottom:4px"><span style="font-size:11px;color:var(--navy-mid);font-family:var(--font-mono);font-weight:600">LN-0038</span><span style="font-size:10px;color:var(--grey-400);font-family:var(--font-mono)">2026-04-01</span></div><div style="font-size:12px;color:var(--grey-500)">ZSM-5 ethanol dehydration: 99.1% ethylene purity at 380°C. Step confirmed optimised.</div></div>
+              <div class="kg-item" style="border-bottom:none"><div style="display:flex;gap:10px;margin-bottom:4px"><span style="font-size:11px;color:var(--navy-mid);font-family:var(--font-mono);font-weight:600">LN-0035</span><span style="font-size:10px;color:var(--grey-400);font-family:var(--font-mono)">2026-03-18</span></div><div style="font-size:12px;color:var(--grey-500)">Co-MoS₂ hydroprocessing — freeze-point −42°C. Spec: −47°C. Gap of 5°C remains.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== GAP INTELLIGENCE ===== -->
+      <div class="view" id="view-gaps">
+        <div class="section-header">
+          <div><div class="section-title">Failure + Gap Intelligence Engine</div><div class="section-desc">Learns from failed experiments and detects prediction gaps, knowledge gaps, bottlenecks, and unexplored opportunities.</div></div>
+        </div>
+        <div class="grid-2 mb-16">
+          <div class="card" style="border-top:3px solid var(--red-gov)">
+            <div class="card-header"><div class="card-title" style="color:var(--red-gov)">Active Gaps Detected</div></div>
+            <div class="card-body"><div style="font-size:32px;font-weight:700;color:var(--red-gov);font-family:var(--font-mono)">3</div><div style="font-size:12px;color:var(--grey-400);margin-top:4px">Patterns requiring investigation — last updated 1 hour ago</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Knowledge Coverage Assessment</div></div>
+            <div class="card-body">
+              <div class="acc-row"><div class="acc-name">Temp. range</div><div class="acc-bar-wrap"><div class="acc-actual" style="width:80%"></div></div><div class="acc-pct" style="color:var(--navy-mid)">80%</div></div>
+              <div class="acc-row"><div class="acc-name">Pressure range</div><div class="acc-bar-wrap"><div class="acc-actual" style="width:55%;background:var(--saffron)"></div></div><div class="acc-pct" style="color:var(--saffron)">55%</div></div>
+              <div class="acc-row"><div class="acc-name">Support types</div><div class="acc-bar-wrap"><div class="acc-actual" style="width:70%"></div></div><div class="acc-pct" style="color:var(--navy-mid)">70%</div></div>
+              <div class="acc-row"><div class="acc-name">Novel designs</div><div class="acc-bar-wrap"><div class="acc-actual" style="width:38%;background:var(--grey-400)"></div></div><div class="acc-pct">38%</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="table-card">
+          <div class="table-toolbar"><div class="table-title">Detected Patterns, Hypotheses &amp; Recommendations</div></div>
+          <div class="gap-row"><div class="gap-sev sev-high"></div><div class="gap-content"><div class="gap-title">Fe-based catalysts consistently underperform above 320°C</div><div class="gap-desc">Seven experiments with Fe catalysts show systematic yield drop above 320°C. Predicted: 68–74%; actual: 51–58%. Hypothesis: carbon deposition (coking) deactivating active surface sites. Recommendation: test Fe with ceria promoter at reduced contact time.</div><div class="gap-meta"><span class="status-pill pill-red" style="font-size:9px">High Priority</span><span class="status-pill pill-navy" style="font-size:9px">7 affected experiments</span></div></div><div class="gap-right"><div class="gap-delta" style="color:var(--red-gov)">−15% gap</div><div style="font-size:10px;color:var(--grey-400);margin-top:4px">Confidence: 94%</div></div></div>
+          <div class="gap-row"><div class="gap-sev sev-med"></div><div class="gap-content"><div class="gap-title">No experiments conducted above 10 bar pressure</div><div class="gap-desc">All 24 experiments conducted at 1–5 bar. Literature on Cu-Zn catalysts indicates improved selectivity at elevated pressure (10–20 bar). This parameter space is entirely unexplored. Recommendation: 3 experiments at 15 bar with top 2 candidates.</div><div class="gap-meta"><span class="status-pill pill-amber" style="font-size:9px">Medium Priority</span><span class="status-pill pill-navy" style="font-size:9px">0 experiments at &gt;10 bar</span></div></div><div class="gap-right"><div class="gap-delta" style="color:var(--saffron)">Unknown</div><div style="font-size:10px;color:var(--grey-400);margin-top:4px">Est. benefit: +12%</div></div></div>
+          <div class="gap-row" style="border-bottom:none"><div class="gap-sev sev-opp"></div><div class="gap-content"><div class="gap-title">Bi-metallic Pd-Pt family entirely unexplored — high opportunity</div><div class="gap-desc">AI analysis of Open Catalyst Project identifies Pd-Pt on zeolite supports with theoretical activity 22% above current best performer. Zero experiments in this catalyst family in GPS dataset. Recommendation: synthesise Pd-Pt/HZSM-5 for next experimental batch.</div><div class="gap-meta"><span class="status-pill pill-green" style="font-size:9px">New Opportunity</span><span class="status-pill pill-navy" style="font-size:9px">AI source: Open Catalyst Project</span></div></div><div class="gap-right"><div class="gap-delta" style="color:var(--green-gov)">+22% est.</div><div style="font-size:10px;color:var(--grey-400);margin-top:4px">Confidence: 81%</div></div></div>
+        </div>
+      </div>
+
+      <!-- ===== FEEDBACK LOOP ===== -->
+      <div class="view" id="view-feedback">
+        <div class="section-header">
+          <div><div class="section-title">Feedback Loop</div><div class="section-desc">Log experimental results to trigger model retraining and improve prediction accuracy.</div></div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <div class="card mb-16">
+              <div class="card-header"><div class="card-title">Log Experimental Result</div><span class="status-pill pill-saffron" style="margin-left:auto;font-size:9px">Triggers Model Update</span></div>
+              <div class="card-body">
+                <div class="form-row"><div class="form-label">Experiment ID</div><input class="form-input" id="log-id" value="EXP-025"/></div>
+                <div class="form-row"><div class="form-label">Catalyst</div><select class="form-select" id="log-catalyst"><option>Cu-Zn/SiO₂</option><option>Pd-Ag/Al₂O₃</option><option>Fe-Co/ZSM-5</option><option>Ni-Mo/TiO₂</option><option>Cu-Ce/ZrO₂</option><option>Other</option></select></div>
+                <div class="form-row"><div class="form-label">Actual Yield (%)</div><input class="form-input" id="log-yield" type="number" placeholder="76" min="0" max="100"/></div>
+                <div class="form-row"><div class="form-label">Selectivity (%)</div><input class="form-input" id="log-sel" type="number" placeholder="68" min="0" max="100"/></div>
+                <div class="form-row"><div class="form-label">Temperature (°C)</div><input class="form-input" id="log-temp" type="number" placeholder="340"/></div>
+                <div class="form-row"><div class="form-label">Outcome</div><select class="form-select" id="log-outcome"><option value="pass">✓ Pass</option><option value="partial">~ Partial</option><option value="fail">✗ Fail</option></select></div>
+                <div class="form-row"><div class="form-label">Remarks</div><input class="form-input" id="log-notes" placeholder="Observations, anomalies…"/></div>
+                <button class="btn btn-primary" onclick="logResult()" style="width:100%;margin-top:6px;justify-content:center">Submit &amp; Queue Model Update</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card mb-16">
+              <div class="card-header"><div class="card-title">Model Accuracy — Weekly Trend</div></div>
+              <div class="card-body">
+                <div class="acc-row"><div class="acc-name" style="width:70px">Week 1</div><div class="acc-bar-wrap"><div class="acc-actual" style="width:58%"></div></div><div class="acc-pct">58%</div></div>
+                <div class="acc-row"><div class="acc-name" style="width:70px">Week 2</div><div class="acc-bar-wrap"><div class="acc-actual" style="width:64%"></div></div><div class="acc-pct">64%</div></div>
+                <div class="acc-row"><div class="acc-name" style="width:70px">Week 3</div><div class="acc-bar-wrap"><div class="acc-actual" style="width:71%"></div></div><div class="acc-pct">71%</div></div>
+                <div class="acc-row"><div class="acc-name" style="width:70px">Week 4</div><div class="acc-bar-wrap"><div class="acc-actual" style="width:74%"></div></div><div class="acc-pct">74%</div></div>
+                <div class="acc-row"><div class="acc-name" style="width:70px">This week</div><div class="acc-bar-wrap"><div class="acc-actual" style="width:78%;background:var(--green-gov)"></div></div><div class="acc-pct" style="color:var(--green-gov);font-weight:600">78%</div></div>
+                <div style="margin-top:10px;padding:9px 12px;background:var(--green-light);border:1px solid #A7D7BB;border-radius:var(--r);font-size:11px;color:var(--green-gov);font-weight:500">↑ Accuracy improved 20 percentage points since pilot commencement. Next retraining triggers at 3 new results.</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">Learning Signal Statistics</div></div>
+              <div class="card-body">
+                <table style="width:100%">
+                  <tr style="border-bottom:1px solid var(--border)"><td style="font-size:12px;color:var(--grey-400);padding:7px 0">Total logged results</td><td style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--navy);text-align:right" id="total-logged">24</td></tr>
+                  <tr style="border-bottom:1px solid var(--border)"><td style="font-size:12px;color:var(--grey-400);padding:7px 0">Results with gap detected</td><td style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--amber-gov);text-align:right">8</td></tr>
+                  <tr style="border-bottom:1px solid var(--border)"><td style="font-size:12px;color:var(--grey-400);padding:7px 0">Retraining cycles completed</td><td style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--navy);text-align:right">4</td></tr>
+                  <tr><td style="font-size:12px;color:var(--grey-400);padding:7px 0">Next retraining trigger</td><td style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--green-gov);text-align:right" id="next-trigger">3 results away</td></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────
+const CANDIDATES = [
+  {id:1,name:"Cu-Zn/SiO₂",reaction:"EtOH → Jet Fuel",novel:false,rank:1,activity:88,selectivity:82,stability:79,source:"Open Catalyst Project"},
+  {id:2,name:"Pd-Ag/Al₂O₃",reaction:"EtOH → Jet Fuel",novel:false,rank:2,activity:82,selectivity:76,stability:85,source:"Materials Project"},
+  {id:3,name:"Fe-Co/ZSM-5",reaction:"EtOH → Jet Fuel",novel:true,rank:3,activity:79,selectivity:71,stability:68,source:"AI Generated"},
+  {id:4,name:"Ni-Mo/TiO₂",reaction:"EtOH → Jet Fuel",novel:false,rank:4,activity:71,selectivity:68,stability:74,source:"Open Catalyst Project"},
+  {id:5,name:"Cu-Ce/ZrO₂",reaction:"EtOH → Jet Fuel",novel:true,rank:5,activity:68,selectivity:74,stability:71,source:"AI Generated"},
+  {id:6,name:"Pt/HZSM-5",reaction:"CO₂ → Methanol",novel:false,rank:6,activity:65,selectivity:80,stability:62,source:"BRENDA DB"},
+  {id:7,name:"Ru-Fe/CeO₂",reaction:"EtOH → Jet Fuel",novel:true,rank:7,activity:63,selectivity:69,stability:77,source:"AI Generated"},
+  {id:8,name:"Cu/ZnO",reaction:"CO₂ → Methanol",novel:false,rank:8,activity:61,selectivity:72,stability:55,source:"Open Catalyst Project"},
+  {id:9,name:"Pd-Pt/HZSM-5",reaction:"EtOH → Jet Fuel",novel:true,rank:9,activity:58,selectivity:84,stability:60,source:"AI Generated"},
+  {id:10,name:"Rh/Al₂O₃",reaction:"Syngas → Ethanol",novel:false,rank:10,activity:55,selectivity:65,stability:80,source:"Materials Project"},
+  {id:11,name:"Mo-Bi/SiC",reaction:"Syngas → Ethanol",novel:false,rank:11,activity:52,selectivity:58,stability:72,source:"Open Catalyst Project"},
+  {id:12,name:"Cu-Mn/ZrO₂",reaction:"CO₂ → Methanol",novel:true,rank:12,activity:49,selectivity:61,stability:66,source:"AI Generated"},
+  {id:13,name:"Fe/Al₂O₃",reaction:"EtOH → Jet Fuel",novel:false,rank:13,activity:44,selectivity:48,stability:51,source:"Open Catalyst Project"}
+];
+
+const EXPERIMENTS = [
+  {id:"EXP-001",catalyst:"Cu/ZnO",reaction:"CO₂→MeOH",temp:260,pred:72,actual:68,sel:74,status:"pass",notes:"Good stability at 5h"},
+  {id:"EXP-002",catalyst:"Fe/Al₂O₃",reaction:"EtOH→Jet",temp:340,pred:68,actual:52,sel:44,status:"fail",notes:"Coking observed"},
+  {id:"EXP-003",catalyst:"Pd-Ag/Al₂O₃",reaction:"EtOH→Jet",temp:320,pred:80,actual:82,sel:76,status:"pass",notes:"Exceeded prediction"},
+  {id:"EXP-004",catalyst:"Ni-Mo/TiO₂",reaction:"EtOH→Jet",temp:350,pred:70,actual:69,sel:65,status:"pass",notes:"Stable"},
+  {id:"EXP-005",catalyst:"Cu-Zn/SiO₂",reaction:"EtOH→Jet",temp:330,pred:85,actual:88,sel:82,status:"pass",notes:"Best performer"},
+  {id:"EXP-006",catalyst:"Fe/Al₂O₃",reaction:"EtOH→Jet",temp:350,pred:65,actual:49,sel:40,status:"fail",notes:"Deactivation above 340°C"},
+  {id:"EXP-007",catalyst:"Pt/HZSM-5",reaction:"CO₂→MeOH",temp:250,pred:62,actual:65,sel:80,status:"pass",notes:"High selectivity"},
+  {id:"EXP-008",catalyst:"Rh/Al₂O₃",reaction:"Syngas→EtOH",temp:290,pred:58,actual:55,sel:65,status:"pass",notes:"Moderate activity"},
+  {id:"EXP-009",catalyst:"Fe-Co/ZSM-5",reaction:"EtOH→Jet",temp:335,pred:76,actual:79,sel:71,status:"pass",notes:"Novel — above prediction"},
+  {id:"EXP-010",catalyst:"Cu/ZnO",reaction:"CO₂→MeOH",temp:270,pred:70,actual:44,sel:38,status:"fail",notes:"Deactivated in 48h"},
+  {id:"EXP-011",catalyst:"Cu-Ce/ZrO₂",reaction:"EtOH→Jet",temp:325,pred:65,actual:68,sel:74,status:"pass",notes:"Good selectivity"},
+  {id:"EXP-012",catalyst:"Mo-Bi/SiC",reaction:"Syngas→EtOH",temp:310,pred:55,actual:52,sel:58,status:"pass",notes:"Acceptable"},
+  {id:"EXP-013",catalyst:"Fe/Al₂O₃",reaction:"EtOH→Jet",temp:360,pred:60,actual:44,sel:38,status:"fail",notes:"Pattern confirmed"},
+  {id:"EXP-014",catalyst:"Pd-Ag/Al₂O₃",reaction:"EtOH→Jet",temp:310,pred:82,actual:80,sel:78,status:"pass",notes:"Consistent"},
+  {id:"EXP-015",catalyst:"Ru-Fe/CeO₂",reaction:"EtOH→Jet",temp:340,pred:60,actual:63,sel:69,status:"pass",notes:"Novel — promising"},
+  {id:"EXP-016",catalyst:"Cu-Mn/ZrO₂",reaction:"CO₂→MeOH",temp:255,pred:52,actual:49,sel:61,status:"partial",notes:"Below threshold"},
+  {id:"EXP-017",catalyst:"Ni-Mo/TiO₂",reaction:"EtOH→Jet",temp:340,pred:68,actual:65,sel:62,status:"pass",notes:"Stable"},
+  {id:"EXP-018",catalyst:"Cu-Zn/SiO₂",reaction:"EtOH→Jet",temp:340,pred:86,actual:87,sel:83,status:"pass",notes:"Consistent repeat"},
+  {id:"EXP-019",catalyst:"Fe-Co/ZSM-5",reaction:"EtOH→Jet",temp:330,pred:75,actual:68,sel:70,status:"pass",notes:"Slight underperformance"},
+  {id:"EXP-020",catalyst:"Cu-Zn/SiO₂",reaction:"EtOH→Jet",temp:320,pred:82,actual:85,sel:84,status:"pass",notes:"Best selectivity yet"},
+  {id:"EXP-021",catalyst:"Pd-Ag/Al₂O₃",reaction:"EtOH→Jet",temp:330,pred:70,actual:72,sel:77,status:"pass",notes:"Good selectivity"},
+  {id:"EXP-022",catalyst:"Pd-Pt/HZSM-5",reaction:"EtOH→Jet",temp:335,pred:88,actual:74,sel:84,status:"partial",notes:"⚠ Large prediction gap"},
+  {id:"EXP-023",catalyst:"Ru-Fe/CeO₂",reaction:"EtOH→Jet",temp:345,pred:65,actual:67,sel:70,status:"pass",notes:"Above prediction"},
+  {id:"EXP-024",catalyst:"Pd-Ag/Al₂O₃",reaction:"EtOH→Jet",temp:315,pred:80,actual:82,sel:76,status:"pass",notes:"Confirmed top performer"}
+];
+
+const KG_PAPERS = [
+  {title:"Catalytic ethanol conversion over ZSM-5 variants",year:2023,rel:"High"},
+  {title:"Ru single-atom catalysts for selective hydrogenation",year:2022,rel:"High"},
+  {title:"SAPO-34 in light olefin oligomerization",year:2021,rel:"Medium"},
+  {title:"Freeze-point optimization in SAF production",year:2024,rel:"High"},
+  {title:"Ni-based bifunctional catalysts for jet fuel synthesis",year:2023,rel:"Medium"},
+];
+
+const PRED_DATA = {
+  "Cu-Zn/SiO₂":             {act:88,sel:82,stab:79,yield:81,ev:70,energy:"−1.2 eV"},
+  "Pd-Ag/Al₂O₃":            {act:82,sel:76,stab:85,yield:79,ev:62,energy:"−0.9 eV"},
+  "Fe-Co/ZSM-5 (Novel)":    {act:79,sel:71,stab:68,yield:76,ev:66,energy:"−1.0 eV"},
+  "Ru-Fe/Al₂O₃ SAC (Novel)":{act:94,sel:87,stab:72,yield:91,ev:82,energy:"−1.5 eV"},
+  "Ni-SAPO-34":              {act:87,sel:94,stab:65,yield:83,ev:58,energy:"−0.8 eV"},
+  "Pd-Pt/HZSM-5 (Novel)":   {act:58,sel:84,stab:60,yield:67,ev:44,energy:"−0.6 eV"},
+};
+
+let loggedCount=24, triggerCount=3, energyChart=null;
+
+document.getElementById('live-date').textContent = new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+
+const TITLES = {dashboard:'Overview',copilot:'AI Research Copilot',discovery:'Candidate Discovery',experiments:'Experiment Log',prediction:'Prediction Engine',recommender:'Recommender',knowledge:'Knowledge Graph',gaps:'Gap Intelligence',feedback:'Feedback Loop'};
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  const item=[...document.querySelectorAll('.nav-item')].find(n=>n.getAttribute('onclick')?.includes("'"+id+"'"));
+  if(item) item.classList.add('active');
+  document.getElementById('bc-current').textContent=TITLES[id]||id;
+  if(id==='discovery') renderCandidates('all');
+  if(id==='experiments') renderExperiments('');
+  if(id==='prediction') { updatePredMetrics(); initEnergyChart(); }
+  if(id==='knowledge') renderKGPapers(KG_PAPERS);
+}
+
+// CANDIDATES
+function renderCandidates(filter) {
+  const grid=document.getElementById('candidates-grid');
+  const list=filter==='all'?CANDIDATES:filter==='novel'?CANDIDATES.filter(c=>c.novel):CANDIDATES.filter(c=>!c.novel);
+  grid.innerHTML=list.map(c=>`
+    <div class="cand-card ${c.novel?'novel':''}">
+      ${c.novel?'<div class="ai-tag">AI Generated</div>':''}
+      <div style="display:flex;align-items:center;margin-bottom:4px">
+        <span class="rank-badge rank-${c.rank<=3?c.rank:''}">${c.rank}</span>
+        <div class="cand-name">${c.name}</div>
+      </div>
+      <div class="cand-reaction">${c.reaction} · <span style="font-size:10px">${c.source}</span></div>
+      <div class="metric-row">
+        <div class="metric"><div class="metric-label">Activity</div><div class="metric-bar-bg"><div class="metric-bar bar-navy" style="width:${c.activity}%"></div></div><div class="metric-val">${c.activity}%</div></div>
+        <div class="metric"><div class="metric-label">Selectiv.</div><div class="metric-bar-bg"><div class="metric-bar bar-saff" style="width:${c.selectivity}%"></div></div><div class="metric-val">${c.selectivity}%</div></div>
+        <div class="metric"><div class="metric-label">Stability</div><div class="metric-bar-bg"><div class="metric-bar bar-green" style="width:${c.stability}%"></div></div><div class="metric-val">${c.stability}%</div></div>
+      </div>
+    </div>`).join('');
+}
+function filterTab(type,btn){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderCandidates(type);}
+function filterSearch(q){
+  const list=CANDIDATES.filter(c=>c.name.toLowerCase().includes(q.toLowerCase())||c.reaction.toLowerCase().includes(q.toLowerCase()));
+  document.getElementById('candidates-grid').innerHTML=list.map(c=>`
+    <div class="cand-card ${c.novel?'novel':''}">
+      ${c.novel?'<div class="ai-tag">AI Generated</div>':''}
+      <div style="display:flex;align-items:center;margin-bottom:4px"><span class="rank-badge">${c.rank}</span><div class="cand-name">${c.name}</div></div>
+      <div class="cand-reaction">${c.reaction}</div>
+      <div class="metric-row">
+        <div class="metric"><div class="metric-label">Activity</div><div class="metric-bar-bg"><div class="metric-bar bar-navy" style="width:${c.activity}%"></div></div><div class="metric-val">${c.activity}%</div></div>
+        <div class="metric"><div class="metric-label">Selectiv.</div><div class="metric-bar-bg"><div class="metric-bar bar-saff" style="width:${c.selectivity}%"></div></div><div class="metric-val">${c.selectivity}%</div></div>
+        <div class="metric"><div class="metric-label">Stability</div><div class="metric-bar-bg"><div class="metric-bar bar-green" style="width:${c.stability}%"></div></div><div class="metric-val">${c.stability}%</div></div>
+      </div>
+    </div>`).join('');
+}
+
+// EXPERIMENTS
+function renderExperiments(q) {
+  const tbody=document.getElementById('exp-tbody');
+  const list=q?EXPERIMENTS.filter(e=>e.id.toLowerCase().includes(q.toLowerCase())||e.catalyst.toLowerCase().includes(q.toLowerCase())):EXPERIMENTS;
+  tbody.innerHTML=list.map(e=>{
+    const diff=e.actual-e.pred;
+    const dStr=diff>=0?`<span style="color:var(--green-gov);font-weight:600">+${diff}%</span>`:`<span style="color:var(--red-gov);font-weight:600">${diff}%</span>`;
+    const stMap={pass:`<span class="status-pill pill-green" style="font-size:9px;padding:2px 7px">✓ Pass</span>`,fail:`<span class="status-pill pill-red" style="font-size:9px;padding:2px 7px">✗ Fail</span>`,partial:`<span class="status-pill pill-amber" style="font-size:9px;padding:2px 7px">~ Partial</span>`};
+    return `<tr><td class="td-mono td-primary">${e.id}</td><td class="td-mono" style="font-weight:600;color:var(--navy)">${e.catalyst}</td><td class="td-mono" style="color:var(--grey-400);font-size:11px">${e.reaction}</td><td class="td-mono">${e.temp}</td><td class="td-mono" style="color:var(--grey-400)">${e.pred}%</td><td class="td-mono">${e.actual}%</td><td>${dStr}</td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:${e.sel}%;background:var(--navy-light)"></div></div><div style="font-size:10px;font-family:var(--font-mono);color:var(--grey-400);margin-top:2px">${e.sel}%</div></td><td>${stMap[e.status]}</td><td style="font-size:11px;color:var(--grey-500);max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.notes}</td></tr>`;
+  }).join('');
+}
+function filterExp(q){renderExperiments(q);}
+
+// PREDICTION
+function updatePredMetrics() {
+  const cat=document.getElementById('pred-catalyst').value;
+  const d=PRED_DATA[cat];
+  if(!d) return;
+  document.getElementById('pb-act').style.width=d.act+'%';    document.getElementById('pv-act').textContent=(d.act/100).toFixed(2);
+  document.getElementById('pb-sel').style.width=d.sel+'%';    document.getElementById('pv-sel').textContent=d.sel+'%';
+  document.getElementById('pb-stab').style.width=d.stab+'%'; document.getElementById('pv-stab').textContent=d.stab+'%';
+  document.getElementById('pb-yield').style.width=d.yield+'%';document.getElementById('pv-yield').textContent=d.yield+'%';
+  document.getElementById('pb-energy').style.width=d.ev+'%'; document.getElementById('pv-energy').textContent=d.energy;
+}
+
+function initEnergyChart() {
+  const canvas=document.getElementById('energy-canvas');
+  if(!canvas) return;
+  if(energyChart){energyChart.destroy();energyChart=null;}
+  energyChart=new Chart(canvas,{
+    type:'line',
+    data:{labels:['Reactants','TS1','Int1','TS2','Int2','TS3','Products'],datasets:[{data:[0,0.82,0.31,1.04,0.12,0.58,-1.2],borderColor:'#0D3264',backgroundColor:'rgba(13,50,100,0.06)',borderWidth:2,pointRadius:5,pointBackgroundColor:'#0D3264',pointBorderColor:'#fff',pointBorderWidth:2,tension:0.35,fill:true}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{title:{display:true,text:'ΔG (eV)',font:{size:11},color:'#8A94A8'},ticks:{font:{size:10},color:'#8A94A8'},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{font:{size:10},color:'#8A94A8'},grid:{display:false}}}}
+  });
+}
+
+function runPrediction(){
+  const btn=document.getElementById('pred-btn');
+  btn.disabled=true;btn.textContent='Simulating…';
+  setTimeout(()=>{updatePredMetrics();btn.disabled=false;btn.textContent='Run Simulation';showToast('Simulation complete.');},1200);
+}
+
+// RECOMMENDER
+function genRecs(){
+  const btn=document.getElementById('rec-btn');btn.disabled=true;btn.textContent='Computing…';
+  setTimeout(()=>{btn.disabled=false;btn.textContent='Generate Recommendations';showToast('Recommendations updated.');},900);
+}
+
+// KNOWLEDGE GRAPH
+function renderKGPapers(papers){
+  const el=document.getElementById('kg-papers');
+  if(!el)return;
+  if(papers.length===0){el.innerHTML='<p style="font-size:12px;color:var(--grey-400);padding:10px 0">No matching papers found.</p>';return;}
+  el.innerHTML=papers.map(p=>`
+    <div class="kg-item">
+      <div style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:4px">${p.title}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;font-family:var(--font-mono);color:var(--grey-400)">${p.year}</span>
+        <span class="kg-badge ${p.rel==='High'?'kg-high':'kg-med'}">${p.rel} relevance</span>
+      </div>
+    </div>`).join('');
+}
+function filterKG(q){renderKGPapers(q?KG_PAPERS.filter(p=>p.title.toLowerCase().includes(q.toLowerCase())):KG_PAPERS);}
+
+// CHAT
+const SYSTEM_PROMPT=`You are CatalystOS, an AI Research Copilot embedded in the National Molecular Discovery Platform for GPS Renewables' NG SAF program (India's first ethanol-to-jet fuel plant).
+
+Internal experiment data (24 records):
+- Top performer: Cu-Zn/SiO₂ — 88% activity, 82% selectivity at 330°C
+- Reliable: Pd-Ag/Al₂O₃ — 82% activity, consistent across runs
+- Failure pattern: Fe/Al₂O₃ — coking above 340°C, confirmed across 3 experiments
+- Novel AI candidates: Fe-Co/ZSM-5 (79%), Cu-Ce/ZrO₂ (68%), Ru-Fe/CeO₂ (63%), Pd-Pt/HZSM-5 (58%), Cu-Mn/ZrO₂ (49%)
+- Large prediction gap: EXP-022 Pd-Pt/HZSM-5 — predicted 88%, actual 74% (−14%)
+
+Scientific databases: Open Catalyst Project, Materials Project, BRENDA.
+
+Guidelines:
+- Use formal, scientific language appropriate for a government research platform.
+- Use proper chemical notation (subscripts described in text).
+- When recommending candidates, include activity/selectivity/stability scores.
+- For failures, provide mechanistic hypotheses.
+- Keep responses focused, structured, and under 200 words.
+- Always relate recommendations to the GPS Renewables ethanol-to-jet mission.`;
+
+let chatHistory=[],isTyping=false;
+
+async function sendMessage(){
+  const input=document.getElementById('chat-input');
+  const msg=input.value.trim();
+  if(!msg||isTyping)return;
+  input.value='';
+  addMessage('user',msg);
+  document.getElementById('suggestions').style.display='none';
+  showTyping();
+  chatHistory.push({role:'user',content:msg});
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM_PROMPT,messages:chatHistory})});
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'Unable to process request. Please retry.';
+    chatHistory.push({role:'assistant',content:reply});
+    removeTyping();
+    addMessage('ai',reply.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>'));
+  }catch(e){
+    removeTyping();
+    addMessage('ai','System note: API connection unavailable. Demo response:<br/><br/><strong>Cu-Zn/SiO₂</strong> remains the top candidate for the ethanol-to-jet program with 88% activity and 82% selectivity at 330°C. Recommended next step: repeat EXP-005 at 320°C to assess whether selectivity improves while maintaining activity above 80%.');
+  }
+}
+function sendSuggestion(el){document.getElementById('chat-input').value=el.textContent;sendMessage();}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+function addMessage(role,html){
+  const c=document.getElementById('chat-messages');
+  const d=document.createElement('div');d.className='msg '+role;
+  d.innerHTML=`<div class="msg-avatar ${role==='user'?'avatar-user':'avatar-ai'}">${role==='user'?'YOU':'AI'}</div><div class="msg-bubble">${html}</div>`;
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+let typingEl=null;
+function showTyping(){isTyping=true;document.getElementById('send-btn').disabled=true;const c=document.getElementById('chat-messages');typingEl=document.createElement('div');typingEl.className='msg ai';typingEl.id='typing';typingEl.innerHTML=`<div class="msg-avatar avatar-ai">AI</div><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;c.appendChild(typingEl);c.scrollTop=c.scrollHeight;}
+function removeTyping(){isTyping=false;document.getElementById('send-btn').disabled=false;if(typingEl){typingEl.remove();typingEl=null;}}
+
+// FEEDBACK
+function logResult(){
+  const yld=document.getElementById('log-yield').value;
+  const sel=document.getElementById('log-sel').value;
+  const temp=document.getElementById('log-temp').value;
+  const id=document.getElementById('log-id').value;
+  if(!yld||!sel||!temp){showToast('Please complete all required fields.');return;}
+  loggedCount++;triggerCount--;
+  document.getElementById('total-logged').textContent=loggedCount;
+  document.getElementById('next-trigger').textContent=triggerCount>0?`${triggerCount} results away`:'Retraining in progress…';
+  document.getElementById('log-id').value=`EXP-0${String(loggedCount+1).padStart(2,'0')}`;
+  EXPERIMENTS.unshift({id,catalyst:document.getElementById('log-catalyst').value,reaction:'EtOH→Jet',temp:parseInt(temp),pred:parseInt(yld)+3,actual:parseInt(yld),sel:parseInt(sel),status:document.getElementById('log-outcome').value,notes:document.getElementById('log-notes').value||'Logged via platform'});
+  showToast(`${id} submitted. Model update queued.`);
+  if(triggerCount<=0){triggerCount=3;setTimeout(()=>{showToast('Model retraining complete — accuracy +2%.');document.getElementById('next-trigger').textContent='3 results away';},2500);}
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+
+// INIT
+renderExperiments('');
+renderCandidates('all');
+renderKGPapers(KG_PAPERS);
+</script>
+</body>
+</html>
