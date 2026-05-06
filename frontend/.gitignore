@@ -1,0 +1,10 @@
+# Backend junk
+venv/
+__pycache__/
+*.db
+.env
+
+# Frontend junk
+node_modules/
+dist/
+.DS_Store

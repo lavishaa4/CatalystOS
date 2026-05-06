@@ -1,0 +1,242 @@
+[
+  {
+    "exp_id": "EXP-022",
+    "timestamp": "2026-05-06T16:38:46.174680",
+    "catalyst": {
+      "base_metal": "Pd",
+      "promoter": "Pt",
+      "support": "HZSM5",
+      "temp": 335,
+      "pressure": 1
+    },
+    "results": {
+      "actual_activity": 74,
+      "actual_selectivity": 84,
+      "predicted_activity": 88,
+      "predicted_selectivity": 86,
+      "outcome": "partial",
+      "notes": "Large gap \u2014 surface reconstruction at 335\u00b0C"
+    },
+    "gap": {
+      "activity_gap": 14,
+      "is_gap": true,
+      "direction": "over"
+    }
+  },
+  {
+    "exp_id": "EXP-023",
+    "timestamp": "2026-05-06T16:38:46.174680",
+    "catalyst": {
+      "base_metal": "Cu",
+      "promoter": "Zn",
+      "support": "SiO2",
+      "temp": 330,
+      "pressure": 1
+    },
+    "results": {
+      "actual_activity": 89,
+      "actual_selectivity": 87,
+      "predicted_activity": 91,
+      "predicted_selectivity": 88,
+      "outcome": "pass",
+      "notes": "GNN candidate first validation \u2014 excellent"
+    },
+    "gap": {
+      "activity_gap": 2,
+      "is_gap": false,
+      "direction": "over"
+    }
+  },
+  {
+    "exp_id": "EXP-024",
+    "timestamp": "2026-05-06T16:38:46.193530",
+    "catalyst": {
+      "base_metal": "Pd",
+      "promoter": "Ag",
+      "support": "Al2O3",
+      "temp": 315,
+      "pressure": 1
+    },
+    "results": {
+      "actual_activity": 82,
+      "actual_selectivity": 76,
+      "predicted_activity": 80,
+      "predicted_selectivity": 77,
+      "outcome": "pass",
+      "notes": "Confirmed top performer"
+    },
+    "gap": {
+      "activity_gap": 2,
+      "is_gap": false,
+      "direction": "under"
+    }
+  },
+  {
+    "exp_id": "EXP-025",
+    "timestamp": "2026-05-06T16:38:46.212696",
+    "catalyst": {
+      "base_metal": "Fe",
+      "promoter": "Co",
+      "support": "ZSM5",
+      "temp": 340,
+      "pressure": 1
+    },
+    "results": {
+      "actual_activity": 65,
+      "actual_selectivity": 68,
+      "predicted_activity": 76,
+      "predicted_selectivity": 71,
+      "outcome": "pass",
+      "notes": "Slight underperformance at higher temp"
+    },
+    "gap": {
+      "activity_gap": 11,
+      "is_gap": true,
+      "direction": "over"
+    }
+  },
+  {
+    "exp_id": "EXP-026",
+    "timestamp": "2026-05-06T16:38:46.231311",
+    "catalyst": {
+      "base_metal": "Ru",
+      "promoter": "Fe",
+      "support": "Al2O3",
+      "temp": 300,
+      "pressure": 5
+    },
+    "results": {
+      "actual_activity": 96,
+      "actual_selectivity": 89,
+      "predicted_activity": 94,
+      "predicted_selectivity": 87,
+      "outcome": "pass",
+      "notes": "High pressure run \u2014 best yield yet"
+    },
+    "gap": {
+      "activity_gap": 2,
+      "is_gap": false,
+      "direction": "under"
+    }
+  },
+  {
+    "exp_id": "EXP-022",
+    "timestamp": "2026-05-06T16:48:39.472545",
+    "catalyst": {
+      "base_metal": "Pd",
+      "promoter": "Pt",
+      "support": "HZSM5",
+      "temp": 335,
+      "pressure": 1
+    },
+    "results": {
+      "actual_activity": 74,
+      "actual_selectivity": 84,
+      "predicted_activity": 88,
+      "predicted_selectivity": 86,
+      "outcome": "partial",
+      "notes": "Large gap \u2014 surface reconstruction at 335\u00b0C"
+    },
+    "gap": {
+      "activity_gap": 14,
+      "is_gap": true,
+      "direction": "over"
+    }
+  },
+  {
+    "exp_id": "EXP-023",
+    "timestamp": "2026-05-06T16:48:39.472545",
+    "catalyst": {
+      "base_metal": "Cu",
+      "promoter": "Zn",
+      "support": "SiO2",
+      "temp": 330,
+      "pressure": 1
+    },
+    "results": {
+      "actual_activity": 89,
+      "actual_selectivity": 87,
+      "predicted_activity": 91,
+      "predicted_selectivity": 88,
+      "outcome": "pass",
+      "notes": "GNN candidate first validation \u2014 excellent"
+    },
+    "gap": {
+      "activity_gap": 2,
+      "is_gap": false,
+      "direction": "over"
+    }
+  },
+  {
+    "exp_id": "EXP-024",
+    "timestamp": "2026-05-06T16:48:39.499714",
+    "catalyst": {
+      "base_metal": "Pd",
+      "promoter": "Ag",
+      "support": "Al2O3",
+      "temp": 315,
+      "pressure": 1
+    },
+    "results": {
+      "actual_activity": 82,
+      "actual_selectivity": 76,
+      "predicted_activity": 80,
+      "predicted_selectivity": 77,
+      "outcome": "pass",
+      "notes": "Confirmed top performer"
+    },
+    "gap": {
+      "activity_gap": 2,
+      "is_gap": false,
+      "direction": "under"
+    }
+  },
+  {
+    "exp_id": "EXP-025",
+    "timestamp": "2026-05-06T16:48:39.519667",
+    "catalyst": {
+      "base_metal": "Fe",
+      "promoter": "Co",
+      "support": "ZSM5",
+      "temp": 340,
+      "pressure": 1
+    },
+    "results": {
+      "actual_activity": 65,
+      "actual_selectivity": 68,
+      "predicted_activity": 76,
+      "predicted_selectivity": 71,
+      "outcome": "pass",
+      "notes": "Slight underperformance at higher temp"
+    },
+    "gap": {
+      "activity_gap": 11,
+      "is_gap": true,
+      "direction": "over"
+    }
+  },
+  {
+    "exp_id": "EXP-026",
+    "timestamp": "2026-05-06T16:48:39.536298",
+    "catalyst": {
+      "base_metal": "Ru",
+      "promoter": "Fe",
+      "support": "Al2O3",
+      "temp": 300,
+      "pressure": 5
+    },
+    "results": {
+      "actual_activity": 96,
+      "actual_selectivity": 89,
+      "predicted_activity": 94,
+      "predicted_selectivity": 87,
+      "outcome": "pass",
+      "notes": "High pressure run \u2014 best yield yet"
+    },
+    "gap": {
+      "activity_gap": 2,
+      "is_gap": false,
+      "direction": "under"
+    }
+  }
+]

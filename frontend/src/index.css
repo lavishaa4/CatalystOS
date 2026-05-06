@@ -1,0 +1,15 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@theme {
+  --color-zinc-950: #9333ea;
+  /* Headings and Logos - PURPLE */
+  --color-zinc-100: #f4f4f5;
+  /* Background hover - Light Gray */
+  --color-zinc-200: #18181b;
+  /* Bold Text */
+  --color-zinc-300: #27272a;
+  /* Normal Text */
+  --color-zinc-400: #52525b;
+  /* Muted Text */
+}

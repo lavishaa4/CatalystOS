@@ -1,0 +1,61 @@
+[
+  {
+    "retrain_id": "RT-001",
+    "timestamp": "2026-05-06T16:38:46.751805",
+    "total_experiments_at_retrain": 5,
+    "new_samples_added": 5,
+    "gaps_detected": 2,
+    "systematic_patterns": [],
+    "metrics_before": {
+      "activity_mae": 0.427,
+      "activity_r2": 0.993
+    },
+    "metrics_after": {
+      "activity_mae": 2.367,
+      "activity_r2": 0.941,
+      "selectivity_mae": 3.29
+    },
+    "improvement": {
+      "mae_delta": -1.94,
+      "r2_delta": -0.052,
+      "improved": false
+    }
+  },
+  {
+    "retrain_id": "RT-002",
+    "timestamp": "2026-05-06T16:48:39.922798",
+    "total_experiments_at_retrain": 10,
+    "new_samples_added": 10,
+    "gaps_detected": 4,
+    "systematic_patterns": [
+      {
+        "metal_family": "Pd",
+        "experiments_affected": 2,
+        "avg_gap_pct": 14.0,
+        "dominant_direction": "over-predicted",
+        "hypothesis": "[Moderate] Surface reconstruction at temperature changes active geometry \u2014 GNN needed for dynamic modelling"
+      },
+      {
+        "metal_family": "Fe",
+        "experiments_affected": 2,
+        "avg_gap_pct": 11.0,
+        "dominant_direction": "over-predicted",
+        "hypothesis": "[Moderate] Coking/carbon deposition deactivating Fe active sites at high temperature \u2014 model lacks coking kinetics"
+      }
+    ],
+    "metrics_before": {
+      "activity_mae": 0.785,
+      "activity_r2": 0.978
+    },
+    "metrics_after": {
+      "activity_mae": 1.245,
+      "activity_r2": 0.979,
+      "selectivity_mae": 1.537
+    },
+    "improvement": {
+      "mae_delta": -0.46,
+      "r2_delta": 0.001,
+      "improved": false
+    }
+  }
+]
